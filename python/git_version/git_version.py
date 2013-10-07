@@ -3,6 +3,10 @@ import os.path
 import git
 
 
+#-----------------------------------------------------------------------------
+
+##
+## Returns the given path forced to be a directory (append "./" if not a dir)
 def ensure_dir( path ):
     if path is None:
         return None
@@ -10,8 +14,13 @@ def ensure_dir( path ):
         return os.path.join( path, "./" )
     return path
 
+#-----------------------------------------------------------------------------
 
-
+##
+## Return the root git directory for the git repository including the 
+## given path. This is in particularly useful for submodules, which are
+## git repositories themselves but we want to find the "parent" git repo
+## which includes the submodules.
 def locate_git_root( initial_path ):
     
     # get the real absolute path
@@ -42,7 +51,13 @@ def locate_git_root( initial_path ):
 
 #----------------------------------------------------------------------------
 
-def get_code_version( repo_filename = None, return_empty_keys=False ):
+##
+## Returns a JSON string with the code version for the
+## root git repo containing the given path.
+## (optionally, do not wuery for hte root repo is use_given_path=True)
+def get_code_version( repo_filename = None, 
+                      return_empty_keys=False,
+                      use_given_path=False):
     """Return the code repository version of the GIT repository at the given
        lcoation. If no location is given, the current working directory is
        used instead.
@@ -63,12 +78,16 @@ def get_code_version( repo_filename = None, return_empty_keys=False ):
     if repo_filename is None:
         repo_filename = os.getcwd()
     #print "Repo Filename: %s" % repo_filename
-    repo_root = locate_git_root( repo_filename )
+    repo_root = None
+    if use_given_path:
+        repo_root = repo_filename
+    else:
+        repo_root = locate_git_root( repo_filename )
 
-    #print "Repo Root: %s" % repo_root
+    print "Repo Root: %s" % repo_root
 
     repo = git.Repo( repo_root )
-    #print "Repo: %s" % repo.git_dir 
+    print "Repo: %s" % repo.git_dir 
 
     # gather all diffs from the current head
     for head in repo.heads:
@@ -107,9 +126,33 @@ def get_code_version( repo_filename = None, return_empty_keys=False ):
                                                      "commit" : head.commit.hexsha } } )
                 else:
                     # here, we have untracked content in the submodules
-                    # Not sure what to do here
-                    # TODO: fix this
-                    pass
+                    # So we recursively get their code version (for the
+                    # submodule repo) and store it
+                    # The information is in hte raw diff (nowehere else!)
+                    raw_diff = d.diff
+                    
+                    # parse the raw diff to extract the submodule path
+                    lines = raw_diff.split('\n')
+                    if( len( lines ) != 5 ) :
+                        
+                        # this is not what we expect, 
+                        # just make a raw diff section
+                        all_diffs['modified'].append(
+                            { "patch" : d.diff,
+                              "head" :
+                              { "name" : head.name,
+                                "commit" : head.commit.hexsha } } )
+                    else:
+                        path = lines[0][5:]
+                        git_path = os.path.join( repo.git_dir, ".." + path )
+                        print "SUBMODULE: %s" % git_path
+                        # sub_cv = get_code_version( git_path, 
+                        #                            return_empty_keys = return_empty_keys,
+                        #                            use_given_path = True )
+                        # all_diffs["modified"].append(
+                        #     { "submodule" : sub_sc } )
+                        
+                    
                     
                 
     # ok, now gather all untracked files
