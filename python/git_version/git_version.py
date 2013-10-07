@@ -145,12 +145,12 @@ def get_code_version( repo_filename = None,
                     else:
                         path = lines[0][5:]
                         git_path = os.path.join( repo.git_dir, ".." + path )
-                        print "SUBMODULE: %s" % git_path
+                        #print "SUBMODULE: %s" % git_path
                         # sub_cv = get_code_version( git_path, 
                         #                            return_empty_keys = return_empty_keys,
                         #                            use_given_path = True )
-                        # all_diffs["modified"].append(
-                        #     { "submodule" : sub_sc } )
+                        all_diffs["modified"].append(
+                            { "submodule" : git_path } )
                         
                     
                     
