@@ -1,6 +1,7 @@
 import sys
 import git_version
 
+
 if __name__ == "__main__":
     
 
@@ -13,7 +14,7 @@ if __name__ == "__main__":
     
     #print "git root: %s" % str(git_root)
 
-    code_version = None
+    code_version = "{}"
     if git_root is not None:
         code_version = git_version.get_code_version( git_root )
 

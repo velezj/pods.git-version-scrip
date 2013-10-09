@@ -1,6 +1,7 @@
 import os
 import os.path
 import git
+import json
 
 
 #-----------------------------------------------------------------------------
@@ -187,6 +188,6 @@ def get_code_version( repo_filename = None,
         if len(working_diffs) == 0:
             del res["diffs"]
     
-    return res
+    return json.dumps(res)
 
 #----------------------------------------------------------------------------
