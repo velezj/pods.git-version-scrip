@@ -85,10 +85,10 @@ def get_code_version( repo_filename = None,
     else:
         repo_root = locate_git_root( repo_filename )
 
-    print "Repo Root: %s" % repo_root
+    #print "Repo Root: %s" % repo_root
 
     repo = git.Repo( repo_root )
-    print "Repo: %s" % repo.git_dir 
+    #print "Repo: %s" % repo.git_dir 
 
     # gather all diffs from the current head
     for head in repo.heads:
