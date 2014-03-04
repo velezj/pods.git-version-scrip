@@ -16,3 +16,7 @@ pods_install_python_packages(${CMAKE_CURRENT_SOURCE_DIR}/python)
 #pods_install_python_script(hello-python hello.main)
 
 pods_install_python_script( git-version-script git_version.main )
+
+# make sure we install the right vergion of gitpython for our use
+# this uses the pod-run to snatch our virtualenv for python!
+install(CODE "execute_process(COMMAND pod-run pip install gitpython>=0.3.2.RC1)")
