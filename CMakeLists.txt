@@ -20,3 +20,21 @@ pods_install_python_script( git-version-script git_version.main )
 # make sure we install the right vergion of gitpython for our use
 # this uses the pod-run to snatch our virtualenv for python!
 install(CODE "execute_process(COMMAND pod-run pip install gitpython>=0.3.2.RC1)")
+
+
+# install the c++ library
+add_library( git-version-script SHARED
+    src/git_version.cpp
+)
+pods_install_headers(
+    src/git_version.hpp
+    DESTINATION
+    git-version-script
+)
+pods_use_pkg_config_packages( git-version-script boost-1.54.0 pstreams-0.8.0)
+pods_install_pkg_config_file( git-version-script
+    CFLAGS
+    LIBS -lgit-version-script
+    REQUIRES boost-1.54.0 pstreams-0.8.0
+    VERSION 0.0.1)
+pods_install_libraries( git-version-script )
